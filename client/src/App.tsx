@@ -21,10 +21,6 @@ interface Click {
   timestamp: string
 }
 
-// const handleClick: any = (color: String) => {
-//   console.log(color); // alerts BUTTON
-// }
-
 const Wrapper = styled.div`
   display: flex;
   width: 100%;
@@ -47,10 +43,11 @@ const App: React.FC = () => {
   });
 
   return (
-    <Wrapper>
+    <>
       {error ? <p>Oh no! {error.message}</p> : null}
       {console.log(data)}
       {data && data.addClick ? <p>Saved!</p> : null}
+    <Wrapper>
       <MyButton 
         symbol={"-"} 
         handleClick={async (color) => {
@@ -66,6 +63,7 @@ const App: React.FC = () => {
         }}  
         myClassName={'blue'} />
     </Wrapper>
+    </>
   );
 }
 
