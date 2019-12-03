@@ -1,108 +1,129 @@
-import React, { useEffect, useState, FunctionComponent } from 'react';
-
+import React, { useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import {
-  XYPlot,
-  XAxis,
-  YAxis,
-  HorizontalGridLines,
-  VerticalGridLines,
-  LineSeries
-} from 'react-vis';
 
+const initialState = {
+  labels: ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'],
+  datasets: [
+    {
+      label: 'Black',
+      fill: false,
+      borderColor: '#000',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      label: 'Blue',
+      fill: false,
+      borderColor: '#1721FF',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      label: 'Orange',
+      fill: false,
+      borderColor: '#FF7E05',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  ]
+};
 interface Click {
   id: string,
   color: string,
   timestamp: Date
 }
 
-type GraphProps = {
-  data: {
-    newClicks: [Click]
-  }
+interface IntNewClicks {
+  newClicks: [Click]
 }
 
+interface LineChartProps {
+  data: IntNewClicks
 
-
-
-const options = {
-  legend: {
-    display: false,
-  },
-  maintainAspectRatio: true
 }
-const orangeData: Array<Number> = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const blueData: Array<Number> = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const allData: Array<Number> = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const dataMy = {
-  labels: ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'],
-  datasets: [
-    {
-      label: 'Click',
-      fill: false,
-      borderColor: '#000',
-      data: allData
-    },
-    {
-      label: 'Blue',
-      fill: false,
-      borderColor: '#1721FF',
-      data: orangeData
-    },
-    {
-      label: 'Orange',
-      fill: false,
-      borderColor: '#FF7E05',
-      data: blueData
-    }
-  ]
-};
+interface IState {
+  datasets?: any;
+  labels?: any
+}
 
+let dots: number = 0;
+let dotsBlue: number = 0;
+let dotsOrange: number = 0;
 
-const Chart: FunctionComponent<GraphProps> = (data) => {
-  const [dataChart, setDataChart] = useState(dataMy)
+let finalData: Array<number> = []
+let finalDataBLue: Array<number> = []
+let finalDataOrange: Array<number> = []
 
-  useEffect(() => {
-    if (data.data) {
-      handleUpdate(data.data)
-    }
-  }, [data])
+let newData = [];
+let newDataBlue = [];
+let newDataOrange = [];
+let secondsNow = 0
+let seconds = 0
+const LineChart: React.FC<LineChartProps> = ({ data }) => {
 
-  const handleUpdate: any = (data: any) => {
-
-    console.log(data.newClicks)
-    if (data.newClicks) {
-
-      dataMy.datasets[0].data = [0, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0]
-      setDataChart(dataMy)
-    }
-    return dataChart
+  if (data && secondsNow === 0) {
+    secondsNow = new Date().getTime()
   }
+  const [info, setInfo] = useState(initialState)
+
+
+  if ((data !== undefined) && finalData.length < 10) {
+    const { newClicks } = data
+    const time = newClicks[newClicks.length - 1].timestamp;
+    seconds = new Date().getTime()
+    if (newClicks[newClicks.length - 1].color == 'blue') {
+      dots = dots + 1
+      dotsBlue = dotsBlue + 1
+      console.log('ADIOS')
+
+    } else {
+      console.log('hola')
+      dots = dots - 1
+      dotsOrange = dotsOrange + 1
+    }
+
+    setTimeout(() => {
+      finalData.push(dots)
+      finalDataBLue.push(dotsBlue)
+      finalDataOrange.push(dotsOrange)
+      dots = 0;
+      dotsBlue = 0;
+      dotsOrange = 0;
+
+    }, 500);
+
+    setTimeout(() => {
+      var oldDataSet = info.datasets[0];
+      var oldDataSetBlue = info.datasets[1];
+      var oldDataSetOrange = info.datasets[2];
+
+      newData = finalData;
+      newDataBlue = finalDataBLue;
+      newDataOrange = finalDataOrange;
+
+      var newDataSet = {
+        ...oldDataSet
+      };
+      var newDataSetBlue = {
+        ...oldDataSetBlue,
+      };
+      var newDataSetOrange = {
+        ...oldDataSetOrange
+      };
+      newDataSet.data = newData;
+      newDataSetBlue.data = newDataBlue;
+      newDataSetOrange.data = newDataOrange;
+
+      var newState = {
+        ...initialState,
+        datasets: [newDataSet, newDataSetBlue, newDataSetOrange]
+      };
+      setInfo(newState)
+    }, 5000)
+  }
+
   return (
-    <>
-      {/* <Line
-        data={() => handleUpdate}
-        width={100}
-        height={100}
-        options={options}
-        redraw /> */}
-      <XYPlot xType="linear" width={300} height={300}>
-        <HorizontalGridLines />
-        <VerticalGridLines />
-        <XAxis title="X Axis" />
-        <YAxis title="Y Axis" />
-        <LineSeries
-          data={[{ x: 1, y: 3 }, { x: 2, y: 5 }, { x: 3, y: 15 }, { x: 4, y: 12 }]}
-        />
-        <LineSeries data={null} />
-        <LineSeries
-          data={[{ x: 1, y: 10 }, { x: 2, y: 4 }, { x: 4, y: 2 }, { x: 5, y: 15 }]}
-        />
-      </XYPlot>
-    </>
+    <Line data={info} />
   );
 
-};
+}
 
 
-export default Chart
+export default LineChart

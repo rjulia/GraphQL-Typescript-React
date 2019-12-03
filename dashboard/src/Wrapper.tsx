@@ -1,8 +1,8 @@
 import React from "react";
 import gql from "graphql-tag";
-import Chart from './Chart'
+import LineChart from './Chart';
 import { useSubscription } from "@apollo/react-hooks";
-
+import './Wrapper.css'
 
 interface Click {
   id: string,
@@ -22,11 +22,18 @@ const CLICKS_SUBSCRIPTION = gql`
   `;
 
 const Wrapper: React.FC = () => {
-  type GraphProps = {
-    newClicks: [Click]
-  }
+
   const { data } = useSubscription(CLICKS_SUBSCRIPTION);
-  return <Chart data={data} />
+  return (
+    <>
+      <div className="main chart-wrapper">
+
+        <LineChart
+          data={data}
+        />
+      </div>
+    </>
+  )
 
 }
 

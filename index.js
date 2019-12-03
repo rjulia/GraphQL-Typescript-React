@@ -48,6 +48,7 @@ const resolvers = {
     }
   },
   Subscription: {
+
     newClicks: {
       subscribe: () => {
         return pubsub.asyncIterator(NEW_CLICK);
@@ -60,6 +61,15 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  subscriptions: {
+    onConnect: (connectionParams, webSocket, context) => {
+      // ...
+      console.log(connectionParams)
+    },
+    onDisconnect: (webSocket, context) => {
+      // ...
+    },
+  },
   playground: true
 });
 server.applyMiddleware({ app, path: '/graphql' });
